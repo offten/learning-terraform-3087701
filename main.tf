@@ -40,6 +40,38 @@ resource "aws_instance" "web" {
   }
 }
 
+module "blog_alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name            = "blog-alb"
+  vpc_id          = module.blog_vpc.vpc_id
+  subnets         = module.blog_vpc.public_subnets
+  security_groups = module.sg.security_group_id
+
+  listeners = {
+    http = {
+      port            = 80
+      protocol        = "HTTP"
+      forward = {
+        target_group_key = "instance"
+      }
+    }
+  }
+
+  target_groups = {
+    instance = {
+      name_prefix      = "blog-"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = aws_instance.web.id
+    }
+  }
+
+  tags = {
+    Environment = "Dev"
+  }
+}
+
 module "sg" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.1.0"
