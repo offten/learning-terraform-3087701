@@ -51,7 +51,7 @@ module "blog_alb" {
 
   load_balancer_type = "application"
 
-  http-tcp-listeners = [
+  http_tcp_listeners = [
     {
       port = 80
       protocol = "HTTP"
